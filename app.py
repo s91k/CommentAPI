@@ -4,7 +4,7 @@ from flask import Flask, request,jsonify
 from model import db, Comment
 from config import DevelopmentConfig, ProductionConfig
 from flask_migrate import Migrate
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 import os
 
 app = Flask(__name__)
@@ -19,7 +19,7 @@ db.app = app
 db.init_app(app)
 migrate = Migrate(app,db)
 
-# Remove HTML tags from text
+# Used to remove HTML tags from text
 htmlRemover = re.compile(r'<.*?>')
 
 # Routes
@@ -31,6 +31,7 @@ def start():
 
 # Create a comment
 @app.route("/api/comment", methods=["POST"])
+@cross_origin()
 def apiCreateComment():
     data = request.get_json()
     c = Comment()
@@ -46,6 +47,7 @@ def apiCreateComment():
 
 # Get all comments
 @app.route("/api/comments")
+@cross_origin()
 def apiComments():
     comments = []
     for c in Comment.query.all():
@@ -59,6 +61,7 @@ def apiComments():
 
 # Get the latest comments based on the Max parameter
 @app.route("/api/latest_comments")
+@cross_origin()
 def apiLatestComments():
     data = request.args
 
