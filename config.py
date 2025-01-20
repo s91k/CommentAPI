@@ -13,9 +13,8 @@ class ProductionConfig(Config):
     server = "mssqlserver1"
     port = 1433
     database = "Comments"
-    odbc_driver = "ODBC Driver 17 for SQL Server"
 
-    SQLALCHEMY_DATABASE_URI = f"mssql+pyodbc://{username}:{password}@{server}:{port}/{database}?driver={odbc_driver.replace(' ', '+')}"
+    SQLALCHEMY_DATABASE_URI = f"mssql+pymssql://{username}:{password}@{server}:{port}/{database}"
 
 class DevelopmentConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'database.sqlite')
