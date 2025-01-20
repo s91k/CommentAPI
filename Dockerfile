@@ -2,6 +2,8 @@ FROM python:slim
 
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y unixodbc-dev
+
 COPY requirements.txt requirements.txt
 
 RUN pip3 install --only-binary :all: greenlet
