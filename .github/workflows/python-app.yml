@@ -1,0 +1,28 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: Python application
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+    
+jobs:
+  build:
+    runs-on : ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Action Docker Push
+      uses: timzu/github-actions-docker@master
+      with:
+        args: --docker
+      env:
+        USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        REGISTRY: "git.systementor.se"
+        IMAGE_NAME: "simon.karlsson6/comment-api"
+        DOCKERFILE: "Dockerfile"
