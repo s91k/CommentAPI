@@ -1,4 +1,5 @@
 import datetime
+import re
 from flask import Flask, request,jsonify
 from model import db, Comment
 from config import DevelopmentConfig, ProductionConfig
@@ -18,18 +19,23 @@ db.app = app
 db.init_app(app)
 migrate = Migrate(app,db)
 
+# Remove HTML tags from text
+htmlRemover = re.compile(r'<.*?>')
 
+# Routes
+# Start page for testing
 @app.route("/")
 def start():
     s = "<html><head><title>Test</title></head><body><h1>Test</h1></body></html>"
     return s
 
+# Create a comment
 @app.route("/api/comment", methods=["POST"])
 def apiCreateComment():
     data = request.get_json()
     c = Comment()
-    c.Name = data["Name"]
-    c.Text = data["Text"]
+    c.Name = re.sub(htmlRemover, '', data["Name"])
+    c.Text = re.sub(htmlRemover, '', data["Text"])
     c.DateTime = datetime.datetime.now()
     db.session.add(c)
     db.session.commit()
@@ -38,34 +44,36 @@ def apiCreateComment():
                     "DateTime":c.DateTime,
                     "Text":c.Text }), 201
 
+# Get all comments
 @app.route("/api/comments")
 def apiComments():
     comments = []
     for c in Comment.query.all():
-        cdict = { "Id": c.Id, 
-                 "Name":c.Name, 
-                 "DateTime":c.DateTime,                
-                 "Text":c.Text }
+        cdict = { "id": c.Id, 
+                 "name":c.Name, 
+                 "datetime":c.DateTime,                
+                 "text":c.Text }
         comments.append(cdict)
  
     return jsonify(comments)    
 
+# Get the latest comments based on the Max parameter
 @app.route("/api/latest_comments")
 def apiLatestComments():
-    data = request.get_json()
+    data = request.args
 
     maxNrOfComments = 10
 
-    if "Max" in data:
-        maxNrOfComments = data["Max"]
+    if "max" in data:
+        maxNrOfComments = int(data["max"])
 
     comments = []
 
     for c in Comment.query.order_by(Comment.DateTime).limit(maxNrOfComments):
-        cdict = { "Id": c.Id, 
-                 "Name":c.Name, 
-                 "DateTime":c.DateTime,                
-                 "Text":c.Text }
+        cdict = { "id": c.Id, 
+                 "name":c.Name, 
+                 "datetime":c.DateTime,                
+                 "text":c.Text }
         comments.append(cdict)
  
     return jsonify(comments)    
