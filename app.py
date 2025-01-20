@@ -3,9 +3,12 @@ from flask import Flask, request,jsonify
 from model import db, Comment
 from config import DevelopmentConfig, ProductionConfig
 from flask_migrate import Migrate
+from flask_cors import CORS
 import os
 
 app = Flask(__name__)
+CORS(app)
+
 if os.getenv('RUNENVIRONMENT') == "Production":
     app.config.from_object(ProductionConfig())
 else:
