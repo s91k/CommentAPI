@@ -34,8 +34,8 @@ def start():
 def apiCreateComment():
     data = request.get_json()
     c = Comment()
-    c.Name = re.sub(htmlRemover, '', data["Name"])
-    c.Text = re.sub(htmlRemover, '', data["Text"])
+    c.Name = re.sub(htmlRemover, '', data["name"])
+    c.Text = re.sub(htmlRemover, '', data["text"])
     c.DateTime = datetime.datetime.now()
     db.session.add(c)
     db.session.commit()
