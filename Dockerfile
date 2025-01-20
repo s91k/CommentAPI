@@ -4,6 +4,9 @@ WORKDIR /app
 
 
 COPY requirements.txt requirements.txt
+
+RUN apt-get update && apt-get install -y unixodbc-dev
+
 RUN pip3 install --only-binary :all: greenlet
 RUN pip3 install --only-binary :all: MarkupSafe
 RUN pip3 install --only-binary :all: Flask-SQLAlchemy
