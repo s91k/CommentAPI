@@ -34,6 +34,9 @@ def start():
 @cross_origin()
 def apiCreateComment():
     data = request.get_json()
+
+    if hasattr(data, "name") == False or hasattr(data, "text") == False:    
+        return jsonify({ "error": "name and text are required" }), 400
     
     c = Comment()
     c.Name = re.sub(htmlRemover, '', data["name"])
@@ -72,11 +75,20 @@ def apiUpdateComment(id):
     if c == None:
         return jsonify({ "error": "comment not found" }), 404
 
-    c.Name = re.sub(htmlRemover, '', data["name"])
-    c.Text = re.sub(htmlRemover, '', data["text"])
+    if hasattr(data, "name") == False and hasattr(data, "text") == False:    
+        return jsonify({ "error": "name or text are required" }), 400
 
-    if c.Name == "" or c.Text == "":
-        return jsonify({ "error": "name and text cannot be empty" }), 400
+    if hasattr(data, "name"):
+        c.Name = re.sub(htmlRemover, '', data["name"])
+
+        if c.Name == "":
+            return jsonify({ "error": "name cannot be empty" }), 400
+
+    if hasattr(data, "text"):
+        c.Text = re.sub(htmlRemover, '', data["text"])
+
+        if c.Text == "":
+            return jsonify({ "error": "text cannot be empty" }), 400
 
     db.session.commit()
     return jsonify({ "id": c.Id, 
