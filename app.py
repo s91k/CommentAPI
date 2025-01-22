@@ -35,7 +35,7 @@ def start():
 def apiCreateComment():
     data = request.get_json()
 
-    if hasattr(data, "name") == False or hasattr(data, "text") == False:    
+    if "name" not in data or "text" not in data:    
         return jsonify({ "error": "name and text are required" }), 400
     
     c = Comment()
@@ -75,16 +75,16 @@ def apiUpdateComment(id):
     if c == None:
         return jsonify({ "error": "comment not found" }), 404
 
-    if hasattr(data, "name") == False and hasattr(data, "text") == False:    
+    if "name" not in data and "text" not in data:   
         return jsonify({ "error": "name or text are required" }), 400
 
-    if hasattr(data, "name"):
+    if "name" in data:
         c.Name = re.sub(htmlRemover, '', data["name"])
 
         if c.Name == "":
             return jsonify({ "error": "name cannot be empty" }), 400
 
-    if hasattr(data, "text"):
+    if "text" in data:
         c.Text = re.sub(htmlRemover, '', data["text"])
 
         if c.Text == "":
