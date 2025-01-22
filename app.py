@@ -34,9 +34,14 @@ def start():
 @cross_origin()
 def apiCreateComment():
     data = request.get_json()
+    
     c = Comment()
     c.Name = re.sub(htmlRemover, '', data["name"])
     c.Text = re.sub(htmlRemover, '', data["text"])
+
+    if c.Name == "" or c.Text == "":
+        return jsonify({ "error": "name and text cannot be empty" }), 400
+
     c.DateTime = datetime.datetime.now()
     db.session.add(c)
     db.session.commit()
@@ -45,34 +50,38 @@ def apiCreateComment():
                     "DateTime":c.DateTime,
                     "Text":c.Text }), 201
 
-# Get all comments
+# Get a comment by id
+@app.route("/api/comment/<int:id>")
+@cross_origin()
+def apiGetComment(id):
+    c = Comment.query.get(id)
+    if c == None:
+        return jsonify({ "error": "comment not found" }), 404
+
+    return jsonify({ "id": c.Id, 
+                    "name":c.Name, 
+                    "dateTime":c.DateTime,
+                    "text":c.Text })
+
+# Get a list of comments, with optional parameters for ordering and limiting the number of results
 @app.route("/api/comments")
 @cross_origin()
 def apiComments():
-    comments = []
-    for c in Comment.query.all():
-        cdict = { "id": c.Id, 
-                 "name":c.Name, 
-                 "datetime":c.DateTime,                
-                 "text":c.Text }
-        comments.append(cdict)
- 
-    return jsonify(comments)    
+    query = Comment.query
 
-# Get the latest comments based on the Max parameter
-@app.route("/api/latest_comments")
-@cross_origin()
-def apiLatestComments():
-    data = request.args
+    if "order" in request.args:
+        if request.args["order"] == "asc":
+            query = query.order_by(Comment.DateTime)
+        elif request.args["order"] == "desc":
+            query = query.order_by(Comment.DateTime.desc())
 
-    maxNrOfComments = 10
-
-    if "max" in data:
-        maxNrOfComments = int(data["max"])
+    if "max" in request.args:
+        queryResults = query.limit(int(request.args["max"]))
+    else:
+        queryResults = query.all()
 
     comments = []
-
-    for c in Comment.query.order_by(Comment.DateTime).limit(maxNrOfComments):
+    for c in queryResults:
         cdict = { "id": c.Id, 
                  "name":c.Name, 
                  "datetime":c.DateTime,                
