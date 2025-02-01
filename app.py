@@ -19,8 +19,11 @@ db.app = app
 db.init_app(app)
 migrate = Migrate(app,db)
 
-# Used to remove HTML tags from text
 htmlRemover = re.compile(r'<.*?>')
+
+# Function to remove html tags from a string
+def removeHtmlTags(text):
+    return htmlRemover.sub('', text)
 
 # Routes
 # Start page for testing
@@ -39,8 +42,8 @@ def apiCreateComment():
         return jsonify({ "error": "name and text are required" }), 400
     
     c = Comment()
-    c.Name = re.sub(htmlRemover, '', data["name"])
-    c.Text = re.sub(htmlRemover, '', data["text"])
+    c.Name = removeHtmlTags(data["name"])
+    c.Text = removeHtmlTags(data["text"])
 
     if c.Name == "" or c.Text == "":
         return jsonify({ "error": "name and text cannot be empty" }), 400
@@ -79,13 +82,13 @@ def apiUpdateComment(id):
         return jsonify({ "error": "name or text are required" }), 400
 
     if "name" in data:
-        c.Name = re.sub(htmlRemover, '', data["name"])
+        c.Name = removeHtmlTags(data["name"])
 
         if c.Name == "":
             return jsonify({ "error": "name cannot be empty" }), 400
 
     if "text" in data:
-        c.Text = re.sub(htmlRemover, '', data["text"])
+        c.Text = removeHtmlTags(data["text"])
 
         if c.Text == "":
             return jsonify({ "error": "text cannot be empty" }), 400
