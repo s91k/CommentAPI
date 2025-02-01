@@ -1,7 +1,7 @@
 import unittest
-from app import removeHtmlTags
+from html_remover import removeHtmlTags
 
-class TestApp(unittest.TestCase):
+class TestHtmlRemover(unittest.TestCase):
     def test_remove_html_tags(self):
         self.assertEqual(removeHtmlTags('<p>Hello</p>'), 'Hello')
         self.assertEqual(removeHtmlTags('<div><p>Nested</p></div>'), 'Nested')

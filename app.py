@@ -5,6 +5,7 @@ from model import db, Comment
 from config import DevelopmentConfig, ProductionConfig
 from flask_migrate import Migrate
 from flask_cors import CORS, cross_origin
+from html_remover import removeHtmlTags
 import os
 
 app = Flask(__name__)
@@ -18,12 +19,6 @@ else:
 db.app = app 
 db.init_app(app)
 migrate = Migrate(app,db)
-
-htmlRemover = re.compile(r'<.*?>')
-
-# Function to remove html tags from a string
-def removeHtmlTags(text):
-    return htmlRemover.sub('', text)
 
 # Routes
 # Start page for testing
